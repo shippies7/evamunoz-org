@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville&display=swap" rel="stylesheet" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ELOS - Refugio Digital</title>
+
+    <!-- Fuentes -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Lora:wght@400;500&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Config Tailwind (opcional, para fuentes custom y colores si querés) -->
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              lora: ['Lora', 'serif'],
+              inter: ['Inter', 'sans-serif'],
+              playfair: ['Playfair Display', 'serif'],
+            },
+            colors: {
+              oscuro: '#686968',
+              marron: '#b9a09c',
+              gris: '#c4c2c2',
+              grisClaro: '#f0ebea',
+              rosita: '#ebd1d4',
+            },
+          }
+        }
+      }
+    </script>
+  </head>
+  <body class="bg-grisClaro text-oscuro font-lora">
+    <div id="app"></div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
