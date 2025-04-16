@@ -1,48 +1,57 @@
 <template>
     <div class="vivo-container">
-      <h1>Clase en vivo</h1>
-  
-      <p class="desc">
+      <h1 class="vivo-title">Clase en vivo</h1>
+      <p class="vivo-description">
         Este es un rincón especial dentro de ELOS, donde el conocimiento se comparte en tiempo real, y la presencia cobra sentido. Estás en casa.
       </p>
   
-      <div class="zoom-frame">
+      <div class="zoom-embed">
         <iframe
-          src="https://us06web.zoom.us/wc/5488032439/join?pwd=eVNlbFk3TZdSb0IzK1VKOW5MT0dXQT09"
+          :src="zoomURL"
           allow="camera; microphone; fullscreen; speaker; display-capture"
-          allowfullscreen
           frameborder="0"
+          width="100%"
+          height="600"
         ></iframe>
       </div>
     </div>
   </template>
   
-  <script setup>
-  // Nada por ahora, todo fluye 💫
+  <script>
+  export default {
+    data() {
+      return {
+        zoomURL: "https://us06web.zoom.us/j/81187185049?pwd=xbmWlpgQRpeFZMBaWvNhP96IllXs8a1",
+      };
+    },
+  };
   </script>
   
   <style scoped>
   .vivo-container {
     max-width: 900px;
-    margin: 40px auto;
-    padding: 2rem;
+    margin: 0 auto;
+    padding: 50px 20px;
     text-align: center;
-    background: #f0ebea;
-    border-radius: 12px;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
   }
   
-  .zoom-frame iframe {
-    width: 100%;
-    height: 600px;
-    border-radius: 12px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.15);
+  .vivo-title {
+    font-size: 2.2rem;
+    font-family: 'Libre Baskerville', serif;
+    color: #b9a09c;
+    margin-bottom: 15px;
   }
   
-  .desc {
-    margin-bottom: 2rem;
-    color: #565657;
+  .vivo-description {
     font-size: 1rem;
+    color: #686968;
+    margin-bottom: 40px;
+  }
+  
+  .zoom-embed {
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   }
   </style>
   
