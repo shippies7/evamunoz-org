@@ -22,6 +22,21 @@ const routes = [
     component: () => import("../views/Vivo.vue"),
     meta: { requiresAuth: true }
   },
+  {
+    path: "/privacidad",
+    name: "Privacy",
+    component: () => import("../views/Privacy.vue")
+  },
+  {
+    path: "/terminos",
+    name: "Terms",
+    component: () => import("../views/Terms.vue")
+  },
+  {
+    path: "/soporte",
+    name: "Support",
+    component: () => import("../views/Support.vue")
+  }
 ];
 
 const router = createRouter({

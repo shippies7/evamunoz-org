@@ -1,66 +1,50 @@
 <script setup>
 import { onMounted } from 'vue'
 import ZoomVideo from '@zoom/videosdk'
+import axios from 'axios'
 
+const sdkKey = import.meta.env.VITE_ZOOM_SDK_KEY
+const meetingNumber = import.meta.env.VITE_ZOOM_MEETING_ID
+const userName = 'Eva'
+const userIdentity = 'eva_user'
+const role = 0
 
-// Datos de reunión
-const sdkKey = '60DmzF18SlSnt1nuklehZQ'
-const signatureEndpoint = 'http://localhost:4000/zoom/generate-signature'
-const sessionName = 'ELOS-clase-vip'
-const userName = 'Eva Muñoz'
-const password = '172413'
-
-const startZoomSession = async () => {
-  const client = ZoomVideo.createClient()
-
+onMounted(async () => {
   try {
-    // Inicializar el cliente
-    await client.init('en-US', 'CDN') // Podés cambiar a 'es-ES' si querés
-
-    // Obtener firma
-    const res = await fetch(signatureEndpoint, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        sessionName,
-        role: 0,
-      }),
+    const res = await axios.post('http://localhost:4000/zoom/generate-signature', {
+      meetingNumber,
+      role,
     })
-    const data = await res.json()
-    const signature = data.signature
 
-    // Unirse a la sesión
-    await client.join(
-      sdkKey,
-      signature,
-      sessionName,
-      userName,
-      password
-    )
+    const { signature } = res.data
 
-    console.log('🎉 ¡Te uniste a la sesión!')
+    const client = ZoomVideo.createClient()
+    await client.init('en-US', 'CDN')
+
+    await client.join(sdkKey, signature, meetingNumber, userName, userIdentity)
+
+    const stream = client.getMediaStream()
+    await stream.startVideo()
   } catch (error) {
-    console.error('💥 Error al unirse a la clase:', error)
+    console.error('Error al unirse a Zoom:', error)
   }
-}
+})
 </script>
 
 <template>
-  <div class="text-center py-8">
-    <h1 class="text-3xl font-bold mb-4">Clase en vivo de ELOS 📹✨</h1>
-    <button
-      @click="startZoomSession"
-      class="bg-pink-500 hover:bg-pink-600 text-white font-bold py-2 px-6 rounded"
-    >
-      Entrar a la clase
-    </button>
-    <div id="meeting-container" class="mt-8"></div>
+  <div id="zoom-meeting">
+    <p>Cargando clase en vivo... 🌀</p>
   </div>
 </template>
 
 <style scoped>
-#meeting-container {
+#zoom-meeting {
   width: 100%;
   height: 80vh;
+  background-color: #000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
 }
 </style>
