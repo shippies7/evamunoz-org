@@ -1,77 +1,25 @@
+// backend/routes/zoomRoutes.js
 const express = require("express");
-const axios = require("axios");
 const router = express.Router();
-const qs = require("querystring");
+const crypto = require("crypto");
 require("dotenv").config();
 
-let token = null;
-let tokenExpiry = null;
+router.post("/generate-signature", (req, res) => {
+  const { meetingNumber, role } = req.body;
 
-const getAccessToken = async () => {
-  const now = Date.now();
-  if (token && tokenExpiry && now < tokenExpiry) return token;
+  const sdkKey = process.env.ZOOM_SDK_KEY;
+  const sdkSecret = process.env.ZOOM_SDK_SECRET;
 
-  try {
-    const response = await axios.post(
-      "https://zoom.us/oauth/token",
-      qs.stringify({
-        grant_type: "client_credentials",
-      }),
-      {
-        headers: {
-          "Authorization": `Basic ${Buffer.from(`${process.env.ZOOM_CLIENT_ID}:${process.env.ZOOM_CLIENT_SECRET}`).toString("base64")}`,
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-      }
-    );
-
-    token = response.data.access_token;
-    tokenExpiry = now + response.data.expires_in * 1000;
-    return token;
-  } catch (error) {
-    console.error("Error al obtener token de Zoom:", error.response?.data || error.message);
-    throw new Error("No se pudo obtener el token");
-  }
-};
-
-router.post("/create-meeting", async (req, res) => {
-  const { topic, startTime } = req.body;
-  const userEmail = req.headers["x-user-email"];
-
-  if (userEmail !== process.env.ZOOM_USER_EMAIL) {
-    return res.status(403).json({ error: "No estás autorizada para crear reuniones" });
+  if (!sdkKey || !sdkSecret) {
+    return res.status(500).json({ error: "Faltan claves SDK" });
   }
 
-  try {
-    const accessToken = await getAccessToken();
+  const timestamp = new Date().getTime() - 30000;
+  const msg = Buffer.from(`${sdkKey}${meetingNumber}${timestamp}${role}`).toString("base64");
+  const hash = crypto.createHmac("sha256", sdkSecret).update(msg).digest("base64");
+  const signature = Buffer.from(`${sdkKey}.${meetingNumber}.${timestamp}.${role}.${hash}`).toString("base64");
 
-    const meeting = await axios.post(
-      `https://api.zoom.us/v2/users/me/meetings`,
-      {
-        topic,
-        type: 2,
-        start_time: startTime,
-        timezone: "America/Mexico_City",
-        duration: 30,
-        settings: {
-          join_before_host: false,
-          waiting_room: true,
-          approval_type: 1,
-        },
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          "Content-Type": "application/json",
-        },
-      }
-    );
-
-    res.json(meeting.data);
-  } catch (error) {
-    console.error("Error al crear reunión:", error.response?.data || error.message);
-    res.status(500).json({ error: "Falló la creación de la reunión" });
-  }
+  res.json({ signature });
 });
 
 module.exports = router;

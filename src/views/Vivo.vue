@@ -1,48 +1,66 @@
+<script setup>
+import { onMounted } from 'vue'
+import ZoomVideo from '@zoom/videosdk'
+
+
+// Datos de reunión
+const sdkKey = '60DmzF18SlSnt1nuklehZQ'
+const signatureEndpoint = 'http://localhost:4000/zoom/generate-signature'
+const sessionName = 'ELOS-clase-vip'
+const userName = 'Eva Muñoz'
+const password = '172413'
+
+const startZoomSession = async () => {
+  const client = ZoomVideo.createClient()
+
+  try {
+    // Inicializar el cliente
+    await client.init('en-US', 'CDN') // Podés cambiar a 'es-ES' si querés
+
+    // Obtener firma
+    const res = await fetch(signatureEndpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        sessionName,
+        role: 0,
+      }),
+    })
+    const data = await res.json()
+    const signature = data.signature
+
+    // Unirse a la sesión
+    await client.join(
+      sdkKey,
+      signature,
+      sessionName,
+      userName,
+      password
+    )
+
+    console.log('🎉 ¡Te uniste a la sesión!')
+  } catch (error) {
+    console.error('💥 Error al unirse a la clase:', error)
+  }
+}
+</script>
+
 <template>
-    <div class="vivo-container">
-      <h1>Clase en vivo</h1>
-  
-      <p class="desc">
-        Este es un rincón especial dentro de ELOS, donde el conocimiento se comparte en tiempo real, y la presencia cobra sentido. Estás en casa.
-      </p>
-  
-      <div class="zoom-frame">
-        <iframe
-          src="https://us06web.zoom.us/wc/5488032439/join?pwd=eVNlbFk3TZdSb0IzK1VKOW5MT0dXQT09"
-          allow="camera; microphone; fullscreen; speaker; display-capture"
-          allowfullscreen
-          frameborder="0"
-        ></iframe>
-      </div>
-    </div>
-  </template>
-  
-  <script setup>
-  // Nada por ahora, todo fluye 💫
-  </script>
-  
-  <style scoped>
-  .vivo-container {
-    max-width: 900px;
-    margin: 40px auto;
-    padding: 2rem;
-    text-align: center;
-    background: #f0ebea;
-    border-radius: 12px;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
-  }
-  
-  .zoom-frame iframe {
-    width: 100%;
-    height: 600px;
-    border-radius: 12px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.15);
-  }
-  
-  .desc {
-    margin-bottom: 2rem;
-    color: #565657;
-    font-size: 1rem;
-  }
-  </style>
-  
+  <div class="text-center py-8">
+    <h1 class="text-3xl font-bold mb-4">Clase en vivo de ELOS 📹✨</h1>
+    <button
+      @click="startZoomSession"
+      class="bg-pink-500 hover:bg-pink-600 text-white font-bold py-2 px-6 rounded"
+    >
+      Entrar a la clase
+    </button>
+    <div id="meeting-container" class="mt-8"></div>
+  </div>
+</template>
+
+<style scoped>
+#meeting-container {
+  width: 100%;
+  height: 80vh;
+}
+</style>

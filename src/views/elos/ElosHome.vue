@@ -284,19 +284,14 @@ const backupResponses = ref([
 
 async function loadResponses() {
   try {
-    // Load "Yo del Pasado" responses
     const querySnapshot = await getDocs(collection(db, "yoDelPasado"));
-    responses.value = querySnapshot.docs.map((doc) => doc.data().mensaje);
+    responses.value = querySnapshot.docs.map(doc => doc.data().mensaje);
     if (responses.value.length === 0) {
       responses.value = [...backupResponses.value]; // Use backup if Firebase is empty
     }
     displayedResponses.value = [responses.value[0]];
-
-    // Load "Apoyo Comunitario" profiles
-    const communitySnapshot = await getDocs(collection(db, "communitySupport"));
-    instagramProfiles.value = communitySnapshot.docs.map((doc) => doc.data());
   } catch (error) {
-    console.error("Error al cargar los datos desde Firebase:", error);
+    console.error("Error al cargar los mensajes desde Firebase:", error);
     responses.value = [...backupResponses.value]; // Use backup if Firebase fails
     displayedResponses.value = [responses.value[0]];
   }

@@ -1,41 +1,26 @@
-import express from "express";
-import cors from "cors";
-import dotenv from "dotenv";
-import { createZoomMeeting } from "./services/zoomService.js"; // Asegúrate de que la ruta es correcta
-
-dotenv.config();
-
-console.log("🔍 CLIENT_ID:", process.env.ZOOM_CLIENT_ID);
-console.log("🔍 CLIENT_SECRET:", process.env.ZOOM_CLIENT_SECRET ? "********" : "NO DEFINIDO")
+// backend/server.js
+const express = require("express");
+const cors = require("cors");
+const bodyParser = require("body-parser");
+require("dotenv").config();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const port = process.env.PORT || 5000;
 
+// Middlewares
 app.use(cors());
-app.use(express.json());
+app.use(bodyParser.json());
 
-/**
- * Endpoint para crear una reunión en Zoom
- */
-app.post("/zoom/create-meeting", async (req, res) => {
-  try {
-    const { topic, startTime } = req.body;
-    if (!topic || !startTime) {
-      console.error("❌ Error: Falta el 'topic' o 'startTime'.");
-      return res.status(400).json({ error: "Faltan datos obligatorios para la reunión." });
-    }
+// Rutas
+const zoomRoutes = require("./routes/zoomRoutes");
+app.use("/zoom", zoomRoutes);
 
-    console.log(`📢 [POST] /zoom/create-meeting - Body:`, req.body);
-
-    const meeting = await createZoomMeeting(topic, startTime);
-    res.json(meeting);
-  } catch (error) {
-    console.error("❌ Error al crear la reunión de Zoom:", error.message);
-    res.status(500).json({ error: "No se pudo crear la reunión en Zoom." });
-  }
+// Home temporal (opcional)
+app.get("/", (req, res) => {
+  res.send("Servidor backend corriendo como Messi en el minuto 90 🏃‍♂️⚽️");
 });
 
 // Iniciar servidor
-app.listen(PORT, () => {
-  console.log(`✅ Servidor corriendo en http://localhost:${PORT}`);
+app.listen(port, () => {
+  console.log(`✅ Servidor backend activo en http://localhost:${port}`);
 });
