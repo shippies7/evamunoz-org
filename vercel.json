@@ -19,6 +19,13 @@
     }
   ],
   "rewrites": [
-    { "source": "/(.*)", "destination": "/" }
+    {
+      "source": "/ZOOM_verify_2dc4a41b6877425890a90c690a82a58f.html",
+      "destination": "/ZOOM_verify_2dc4a41b6877425890a90c690a82a58f.html"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/"
+    }
   ]
 }
