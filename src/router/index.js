@@ -36,6 +36,11 @@ const routes = [
     path: "/soporte",
     name: "Support",
     component: () => import("../views/Support.vue")
+  },
+  {
+    path: "/zoom-docs",
+    name: "ZoomDocs",
+    component: () => import("../views/ZoomDocs.vue")
   }
 ];
 
