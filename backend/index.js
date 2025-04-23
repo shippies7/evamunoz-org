@@ -1,32 +1,19 @@
-const crypto = require('crypto');
-require('dotenv').config();
+// backend/index.js
+require('dotenv').config()
+const express = require('express')
+const cors = require('cors')
+const zoomSignature = require('./zoomSignature')
 
-app.post('/zoom/generate-signature', (req, res) => {
-  const { meetingNumber, role } = req.body;
+const app = express()
+const PORT = process.env.PORT || 5000
 
-  const iat = Math.round(new Date().getTime() / 1000) - 30;
-  const exp = iat + 60 * 60 * 2;
+app.use(cors())
+app.use(express.json())
 
-  const oHeader = { alg: 'HS256', typ: 'JWT' };
+// Ruta principal para generar la firma
+app.use('/', zoomSignature)
 
-  const oPayload = {
-    sdkKey: process.env.VITE_ZOOM_SDK_KEY,
-    mn: meetingNumber,
-    role: role,
-    iat: iat,
-    exp: exp,
-    appKey: process.env.VITE_ZOOM_SDK_KEY,
-    tokenExp: exp,
-  };
-
-  const sHeader = Buffer.from(JSON.stringify(oHeader)).toString('base64');
-  const sPayload = Buffer.from(JSON.stringify(oPayload)).toString('base64');
-  const signature = crypto
-    .createHmac('sha256', process.env.VITE_ZOOM_SDK_SECRET)
-    .update(`${sHeader}.${sPayload}`)
-    .digest('base64');
-
-  const finalSig = `${sHeader}.${sPayload}.${signature}`;
-
-  res.json({ signature: finalSig });
-});
+// Iniciar servidor
+app.listen(PORT, () => {
+  console.log(`🟢 Servidor backend activo en http://localhost:${PORT}`)
+})

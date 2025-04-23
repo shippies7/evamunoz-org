@@ -1,50 +1,55 @@
+<template>
+  <div>
+    <h2 class="text-xl font-semibold mb-4">Clase en vivo <span class="text-red-600">●</span></h2>
+    <div id="meetingSDKContainer" style="width: 100%; height: 100vh;"></div>
+  </div>
+</template>
+
 <script setup>
 import { onMounted } from 'vue'
-import ZoomVideo from '@zoom/videosdk'
-import axios from 'axios'
+import { ZoomMtgEmbedded } from '@zoom/meetingsdk/embedded'
 
-const sdkKey = import.meta.env.VITE_ZOOM_SDK_KEY
 const meetingNumber = import.meta.env.VITE_ZOOM_MEETING_ID
-const userName = 'Eva'
-const userIdentity = 'eva_user'
-const role = 0
+const sdkKey = import.meta.env.VITE_ZOOM_SDK_KEY
+const passWord = '172413'
+const userName = 'Invitado'
 
 onMounted(async () => {
+  const client = ZoomMtgEmbedded.createClient()
+  const meetingSDKElement = document.getElementById('meetingSDKContainer')
+
+  client.init({
+    debug: true,
+    zoomAppRoot: meetingSDKElement,
+    language: 'es-ES',
+    customize: {
+      video: { isResizable: true },
+      chat: { isDraggable: true },
+    }
+  })
+
   try {
-    const res = await axios.post('http://localhost:4000/zoom/generate-signature', {
+    const response = await fetch('http://localhost:5000')
+    const data = await response.json()
+    const signature = data.signature
+    console.log('Firma desde backend:', signature)
+
+    await client.join({
+      sdkKey,
+      signature,
       meetingNumber,
-      role,
+      password: passWord,
+      userName
     })
-
-    const { signature } = res.data
-
-    const client = ZoomVideo.createClient()
-    await client.init('en-US', 'CDN')
-
-    await client.join(sdkKey, signature, meetingNumber, userName, userIdentity)
-
-    const stream = client.getMediaStream()
-    await stream.startVideo()
-  } catch (error) {
-    console.error('Error al unirse a Zoom:', error)
+  } catch (err) {
+    console.error('Error al entrar a la reunión:', err)
   }
 })
 </script>
 
-<template>
-  <div id="zoom-meeting">
-    <p>Cargando clase en vivo... 🌀</p>
-  </div>
-</template>
-
 <style scoped>
-#zoom-meeting {
-  width: 100%;
-  height: 80vh;
-  background-color: #000;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: white;
+#meetingSDKContainer {
+  z-index: 999;
+  position: relative;
 }
 </style>

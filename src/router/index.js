@@ -5,7 +5,6 @@ import Register from '../views/Register.vue';
 import Dashboard from '../views/Dashboard.vue';
 import Survey from '../views/Survey.vue';
 import ElosHome from '../views/elos/ElosHome.vue';
-
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 const routes = [
@@ -41,6 +40,11 @@ const routes = [
     path: "/zoom-docs",
     name: "ZoomDocs",
     component: () => import("../views/ZoomDocs.vue")
+  },
+  {
+    path: "/zoom-redirect",
+    name: "ZoomRedirect",
+    component: () => import("../views/ZoomRedirect.vue")
   }
 ];
 

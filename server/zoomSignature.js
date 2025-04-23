@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
 require("dotenv").config();
 
 const app = express();
@@ -14,34 +14,22 @@ app.post("/zoom/generate-signature", (req, res) => {
     return res.status(400).json({ message: "Meeting number and role are required." });
   }
 
-  const sdkKey = process.env.ZOOM_SDK_KEY;
-  const sdkSecret = process.env.ZOOM_SDK_SECRET;
+  const sdkKey = process.env.VITE_ZOOM_SDK_KEY;
+  const sdkSecret = process.env.VITE_ZOOM_SDK_SECRET;
 
   if (!sdkKey || !sdkSecret) {
     return res.status(500).json({ message: "Zoom SDK credentials are missing." });
   }
 
-  const iat = Math.floor(Date.now() / 1000);
-  const exp = iat + 60 * 60;
+  const timestamp = new Date().getTime() - 30000;
+  const msg = Buffer.from(`${sdkKey}${meetingNumber}${timestamp}${role}`).toString("base64");
+  const hash = crypto.createHmac("sha256", sdkSecret).update(msg).digest("base64");
+  const signature = Buffer.from(`${sdkKey}.${meetingNumber}.${timestamp}.${role}.${hash}`).toString("base64");
 
-  const payload = {
-    app_key: sdkKey,
-    tpc: meetingNumber,
-    role_type: role,
-    iat,
-    exp,
-  };
-
-  try {
-    const token = jwt.sign(payload, sdkSecret, { algorithm: "HS256" });
-    res.json({ signature: token });
-  } catch (error) {
-    console.error("Error al generar firma:", error);
-    res.status(500).json({ message: "Error generating signature" });
-  }
+  res.json({ signature });
 });
 
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`✅ Zoom Signature Server running on http://localhost:${PORT}`);
 });
