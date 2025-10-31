@@ -1,138 +1,44 @@
-:root {
-  --color-oscuro: #686968;
-  --color-marron: #b9a09c;
-  --color-gris-medio: #c4c2c2;
-  --color-gris-claro: #f0ebea;
-  --color-rosita: #ebd1d4;
+<template>
+  <div>
+    <h2 class="text-xl font-semibold mb-4">
+      Clase en vivo <span class="text-red-600">●</span>
+    </h2>
+
+    <!-- Botón para probar mostrar/ocultar -->
+    <button 
+      @click="toggle" 
+      class="px-4 py-2 bg-blue-600 text-white rounded mb-4"
+    >
+      Mostrar / Ocultar Zoom
+    </button>
+
+    <!-- Elementos que añade el SDK -->
+    <div id="zmmtg-root"></div>
+    <div id="aria-notify-area"></div>
+  </div>
+</template>
+
+<script setup>
+import { onMounted } from 'vue'
+import { ZoomMtg } from '@zoom/meetingsdk'
+
+// 🔹 Inicializa SOLO desde npm, sin CDN extra
+ZoomMtg.preLoadWasm()
+ZoomMtg.prepareWebSDK()
+
+function toggle() {
+  const el = document.getElementById('zmmtg-root')
+  el.style.display = (el.style.display === 'none') ? 'block' : 'none'
 }
 
-/* 🎀 Estilos globales */
-body {
-  font-family: 'Lora', serif;
-  background-color: var(--color-gris-claro);
-  color: var(--color-oscuro);
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-height: 100vh;
+onMounted(() => {
+  console.log('✅ Meeting SDK preparado (preLoadWasm + prepareWebSDK)')
+})
+</script>
+
+<style scoped>
+#zmmtg-root {
+  min-height: 200px;
+  border: 1px dashed #ccc; /* para ubicarlo visualmente */
 }
-
-
-
-/* 🏠 Encabezados */
-h1, h2 {
-  font-family: 'Playfair Display', serif;
-  color: var(--color-marron);
-  text-align: center;
-  font-size: 38px;
-  font-weight: 700;
-  margin-top: 20px;
-}
-
-p, input, button {
-  font-family: 'Inter', sans-serif;
-}
-
-/* 📌 Navbar */
-nav {
-  background-color: var(--color-oscuro);
-  padding: 10px 0;
-  text-align: center;
-  width: 100%;
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 1000;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15);
-  height: 60px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-nav a {
-  color: white;
-  text-decoration: none;
-  margin: 0 20px;
-  font-weight: 600;
-  font-size: 16px;
-  transition: color 0.3s ease;
-}
-
-nav a:hover {
-  color: var(--color-rosita);
-}
-
-/* 📦 Contenedor principal */
-.container {
-  padding: 20px;
-  text-align: center;
-  max-width: 800px;
-  margin-top: 120px; /* Ajustado para que no tape el navbar */
-}
-
-@media (min-width: 768px) {
-  .container {
-    margin-top: 140px;
-  }
-}
-
-/* 🖼️ Formularios */
-form {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 15px;
-  background: white;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-  max-width: 400px;
-  width: 100%;
-  margin-top: 20px;
-}
-
-/* 🔲 Inputs */
-input {
-  padding: 12px;
-  border: 1px solid var(--color-gris-medio);
-  border-radius: 5px;
-  width: 100%;
-  font-size: 16px;
-}
-
-input:focus {
-  border-color: var(--color-marron);
-  outline: none;
-}
-
-/* 🎀 Botones */
-button {
-  background-color: var(--color-rosita);
-  color: var(--color-oscuro);
-  border: none;
-  padding: 12px 20px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  border-radius: 5px;
-  transition: 0.3s ease;
-}
-
-button:hover {
-  background-color: var(--color-marron);
-  color: white;
-}
-
-/* 📂 Footer */
-footer {
-  margin-top: auto;
-  padding: 10px;
-  text-align: center;
-  font-size: 14px;
-  background-color: var(--color-oscuro);
-  color: white;
-  width: 100%;
-}
+</style>

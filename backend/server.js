@@ -1,20 +1,24 @@
 // backend/server.js
+const express = require("express");
+const app = express();
+const cors = require("cors");
+require("dotenv").config();
 
-const express = require('express')
-const cors = require('cors')
-const app = express()
-require('dotenv').config()
+app.use(cors());
+app.use(express.json());
 
-const zoomSignature = require('./zoomSignature') // Asegurate que este archivo existe
+// 👉 Agregar headers para Cross-Origin Isolation
+app.use((req, res, next) => {
+  res.setHeader("Cross-Origin-Opener-Policy", "same-origin");
+  res.setHeader("Cross-Origin-Embedder-Policy", "require-corp");
+  next();
+});
 
-app.use(cors())
-app.use(express.json())
+// rutas
+const zoomSignatureRoute = require("./zoomSignature");
+app.use("/zoom", zoomSignatureRoute);
 
-// Ruta principal para generar la firma
-app.use('/', zoomSignature)
-
-// Iniciar servidor
-const PORT = process.env.PORT || 5000
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`✅ Servidor backend activo en http://localhost:${PORT}`)
-})
+  console.log(`🚀 Servidor backend activo en http://localhost:${PORT}`);
+});
